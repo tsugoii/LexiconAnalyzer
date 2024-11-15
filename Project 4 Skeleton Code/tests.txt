@@ -1,0 +1,18 @@
+-- Big Test
+
+function test1 returns integer;
+    d: boolean is true;
+    b: integer is
+        if d then
+            2;
+        else
+            5;
+        endif;
+    c: real is 9.8 * 2 + 8;
+begin
+    case b is
+        when 1 => 4.5 + c;
+        when 2 => b;
+        others => c;
+    endcase;
+end;
