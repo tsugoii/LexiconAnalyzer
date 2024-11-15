@@ -1,103 +1,72 @@
 /* Compiler Theory and Design
-   Dr. Duane J. Jarc */
+Originally by: Dr. Duane J. Jarc
+Modified by: Lily Forry */
 
 /* This file contains flex input file */
 
 %{
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <string>
+
+using namespace std;
 
 #include "listing.h"
 #include "tokens.h"
-
-int COMMENT=0;
-int cnt=0;
 
 %}
 
 %option noyywrap
 
-ws		[ \t\r]+
+ws			[ \t\r]+
 comment		\-\-.*\n
-line		[\n]
-id		[A-Za-z][A-Za-z0-9]*
-digit		[0-9]
-int		{digit}+
-real		{int}.{int}[+-][{eE}{int}]
-punc		[\(\),:;]
 comment2	[//].*\n
-opr		[+*-/]
+real		{int}.{int}[+-][{eE}{int}]
 bool		[true|false]
-sem1		{int}={int}{opr}{int}
-sem2		{real}={real}{opr}{real}
-
+line		[\n]
+digit		[0-9]
+relop       ((\/?=|[><]?=<?)|([><]))
+id			[A-Za-z_][A-Za-z0-9]*
+int			{digit}+
+punc		[\(\),:;]
 %%
-#.* { printf("\n%s is a PREPROCESSOR DIRECTIVE",yytext);}
-{ws}		{ ECHO; }
+
+{ws}	{ ECHO;}
 {comment}	{ ECHO; nextLine();}
-{line}		{ ECHO; nextLine();}
-"<"		{ ECHO; return(RELOP); }
-"<="		{ ECHO; return(RELOP); }
-">"		{ ECHO; return(RELOP); }
-">="		{ ECHO; return(RELOP); }
-"="		{ ECHO; return(RELOP); }
-"/="		{ ECHO; return(RELOP); }
-"!"		{ ECHO; return(NOTOP); }
+{comment2}	{ ECHO; nextLine();}
+{bool}		{ ECHO; return(BOOL_LITERAL);}
+{real}	{ ECHO; return(REAL_LITERAL);}
+{line}	{ ECHO; nextLine();}
+{relop}     { ECHO; return(RELOP); }
 "+"		{ ECHO; return(ADDOP); }
+"-"		{ ECHO; return(ADDOP); }
 "*"		{ ECHO; return(MULOP); }
 "/"		{ ECHO; return(MULOP); }
-"=>"		{ ECHO; return(ARROW); }
-"**"		{ ECHO; return(EXPOP); }
 rem		{ ECHO; return(REMOP); }
-begin		{ ECHO; return(BEGIN_); }
-boolean		{ ECHO; return(BOOLEAN); }
+"**"	{ ECHO; return(EXPOP); }
+"=>"	{ ECHO; return(ARROW); }
+and		{ ECHO; return(ANDOP); }
+begin	{ ECHO; return(BEGIN_); }
+boolean	{ ECHO; return(BOOLEAN); }
+case	{ ECHO; return(CASE); }
+else 	{ ECHO; return(ELSE); }
 end		{ ECHO; return(END); }
+endcase	{ ECHO; return(ENDCASE); }
+endif	{ ECHO; return(ENDIF); }
 endreduce	{ ECHO; return(ENDREDUCE); }
 function	{ ECHO; return(FUNCTION); }
 integer		{ ECHO; return(INTEGER); }
-is		{ ECHO; return(IS); }
-reduce		{ ECHO; return(REDUCE); }
-returns		{ ECHO; return(RETURNS); }
-and		{ ECHO; return(ANDOP); }
-case		{ ECHO; return(CASE); }
-endcase		{ ECHO; return(ENDCASE); }
 if		{ ECHO; return(IF); }
-else		{ ECHO; return(ELSE); }
-endif		{ ECHO; appendError(SYNTAX, yytext); }
-endif;		{ ECHO; return(ENDIF); }
-others		{ ECHO; return(OTHERS); }
-real		{ ECHO; return(REAL); }
-then		{ ECHO; return(THEN); }
-when		{ ECHO; return(WHEN);  }
-{id}		{ ECHO; return(IDENTIFIER);  }
-{int}		{ ECHO; return(INT_LITERAL); }
-{bool}		{ ECHO; return(BOOL_LITERAL); }
-{real}		{ ECHO; return(REAL_LITERAL); }
-{punc}		{ ECHO; return(yytext[0]); }
-{sem1} 		{ ECHO; appendError(GENERAL_SEMANTIC, yytext); }
-{sem2} 		{ ECHO; appendError(GENERAL_SEMANTIC, yytext); }
-{comment2}	{ ECHO; printf("Single Line Comment"); }
+is		{ ECHO; return(IS); }
+not		{ ECHO; return(NOTOP); }
+or		{ ECHO; return(OROP); }
+others	{ ECHO; return(OTHERS); }
+real 	{ ECHO; return(REAL); }
+reduce	{ ECHO; return (REDUCE); }
+returns	{ ECHO; return(RETURNS); }
+then	{ ECHO; return(THEN); }
+when	{ ECHO; return(WHEN);}
+{id}	{ ECHO; return(IDENTIFIER);}
+{int}	{ ECHO; return(INT_LITERAL);}
+{punc}	{ ECHO; return(yytext[0]);}
 .		{ ECHO; appendError(LEXICAL, yytext); }
 %%
-
-
-
-int main()
-{
-	firstLine();
-	
-	FILE *file = fopen("d:\templ\lexemes.txt", "wa"); 
-	int token = yylex();
-	while (token!=END)
-	{
-	 
-		fprintf(file, "%d %s\n", token, yytext);
-		
-		//printf( "token printed %d %s\n", token, yytext);
-		token = yylex();
-	}
-	lastLine();
-	fclose(file);
-	getch();
-	return 0;
-}

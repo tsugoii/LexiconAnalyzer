@@ -1,8 +1,6 @@
-/* Compiler Theory and Design
-   Originally: Dr. Duane J. Jarc
-   Modified: Lily Forry
-   Project 1
-   June 28, 2022 */
+/* Compiler Theory and Design */
+/* Originally: Dr. Duane J. Jarc */
+/* Modified by: Lily Forry */
 
 // This file contains the function prototypes for the functions that produce the // compilation listing
 
@@ -13,4 +11,4 @@ void firstLine();
 void nextLine();
 int lastLine();
 void appendError(ErrorCategories errorCategory, string message);
-
+void displayErrors();

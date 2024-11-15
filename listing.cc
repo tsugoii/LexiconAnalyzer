@@ -1,24 +1,25 @@
 // Compiler Theory and Design
-// Dr. Duane J. Jarc
+// Origially by: Dr. Duane J. Jarc
+// Modified by: Lily Forry
 
 // This file contains the bodies of the functions that produces the compilation
 // listing
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <string>
+#include <vector>
+#include <iostream>
 
-enum ErrorCategories {LEXICAL, SYNTAX, GENERAL_SEMANTIC, DUPLICATE_IDENTIFIER,
-	UNDECLARED};
+using namespace std;
 
 #include "listing.h"
-
-
 
 static int lineNumber;
 static string error = "";
 static int totalErrors = 0;
-
-static void displayErrors();
+static int lexicalErrors;
+static int syntaxErrors;
+static int semanticErrors;
 
 void firstLine()
 {
@@ -37,17 +38,35 @@ int lastLine()
 {
 	printf("\r");
 	displayErrors();
-	printf("     \n");
+	printf("\n");
+	if (totalErrors != 0) {
+		printf("\nLexical Errors: %d", lexicalErrors);
+		printf("\nSyntax Errors: %d", syntaxErrors);
+		printf("\nSemantic Errors: %d", semanticErrors);
+		printf("\nTotal Errors: %d", totalErrors); }
+	else if (totalErrors == 0)
+		printf("Compiled Successfully");
+	else
+		printf("You shouldn't hit this");
+	printf("\n");
 	return totalErrors;
 }
     
 void appendError(ErrorCategories errorCategory, string message)
 {
-	string messages[] = { "Lexical Error, Invalid Character ", "",
-		"Semantic Error, ", "Semantic Error, Duplicate Identifier: ",
-		"Semantic Error, Undeclared " };
+	string messages[] = {"Lexical Error, Invalid Character ", "Syntax Error",
+		"Semantic Error, Here", "Semantic Error, Duplicate Identifier: ",
+		"Semantic Error, Undeclared "};
 
-	error = messages[errorCategory] + message;
+	error += messages[errorCategory] + message;
+	if (errorCategory == 0)
+		lexicalErrors++;
+	else if (errorCategory == 1)
+		syntaxErrors++;
+	else if (errorCategory < 2 && errorCategory < 4)
+		semanticErrors++;
+	else
+		printf("You shouldn't of hit this");
 	totalErrors++;
 }
 
@@ -57,4 +76,3 @@ void displayErrors()
 		printf("%s\n", error.c_str());
 	error = "";
 }
-
